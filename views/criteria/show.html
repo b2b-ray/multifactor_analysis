@@ -1,0 +1,11 @@
+<span style='font-weight: bold;' class='criteria-sign'> • </span>
+<span style='font-weight: bold;' class='criteria-variable'> {{=TT(factor['variable'])}} </span>
+<span class='criteria-description'> {{=factor['description']}} </span>
+<span class='criteria-type'> {{=TT(factor['type'])}} </span>
+<span class='criteria-edit'>
+<a href='#'
+    onclick="ajax('{{=URL(c='criteria', f='edit', vars=dict(_id=_id,_cid=_cid))}}', [], '{{=_id}}-criteria-{{=_cid}}'); return false;"
+        > Edit</a>
+ - 
+{{=A('delete', callback=URL(c='criteria', f='delete', vars=dict(_id=_id,_cid=_cid)), delete='#%s-criteria-%s' % (_id, _cid))}}
+</span>

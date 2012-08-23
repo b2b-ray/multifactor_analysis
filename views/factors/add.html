@@ -1,0 +1,9 @@
+{{out="""
+<h3> <a href="#">DSsd</a></h3>
+<div>
+        dlsmkdlsm
+</div>
+"""
+}}
+{{out=out.replace('\n','')}}
+$('#factors').append('{{=XML(out).replace("'", "&quot;")}}');

@@ -1,0 +1,22 @@
+{{extend 'layout.html'}}
+
+<h1> Multifactor analysis </h1>
+
+List of avalable studies:
+
+<script>
+	$(function() {
+	    $( "input:submit",".list-of-studies" ).button({ text: false,
+		icons: {primary:'ui-icon-gear',secondary:'ui-icon-triangle-1-s'}});
+	});
+</script>
+
+<ol class='list-of-studies'>
+{{for el in rows:}}
+<li><b>{{=el['title']}}</b> 
+<a href='{{=URL(r=request, c="studies", f="manage", vars=dict(study=str(el["_id"])))}}'>edit factors</a>
+</li>
+{{pass}}
+</ol>
+{{=A('Create a new study...' ,_href=URL(r=request,c='studies',  f='edit'))}}
+

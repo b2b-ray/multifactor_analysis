@@ -1,0 +1,29 @@
+{{extend 'layout.html'}}
+
+<h1>Study: {{=study['title']}}</h1>
+
+<div class='study_description'> 
+    <em>{{=study['description']}}</em><br />
+</div>
+
+{{for cat in cats:}}
+<input type="button" value="{{=cat['title']}}" 
+{{if str(cat['_id']) == request.vars['category']:}}
+class='activated'
+{{curr_cat=cat}}
+{{else:}}
+onclick="location='{{=URL(r=request, vars=dict(study=request.vars["study"], category=cat['_id']))}}';"
+{{pass}}
+>
+{{pass}}
+
+{{if 'curr_cat' in globals():}}
+<div class="statusbar clearfix">
+    <h5 style='margin-top: 0;'> Category description:</h5>
+    <div class="breadcrumbs">{{=curr_cat['description']}}</div>
+</div>
+
+{{=LOAD(c='dataset', f='show', vars=request.vars, ajax=True)}}
+{{pass}}
+
+

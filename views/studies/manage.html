@@ -1,0 +1,66 @@
+{{extend 'layout.html'}}
+
+<h1>Study: {{=study['title']}}</h1>
+<span style='float: right;'> 
+    <a href='{{=URL(r=request, c="studies", f="edit", vars=request.vars)}}'>Edit study metadata</a> -
+    <a href='{{=URL(r=request, c="studies", f="delete", vars=request.vars)}}'> delete </a>
+</span>
+
+<div class='study_description'> 
+    <em>{{=study['description']}}</em><br />
+</div>
+
+{{for cat in cats:}}
+<input type="button" value="{{=cat['title']}}" 
+{{if str(cat['_id']) == request.vars['category']:}}
+class='activated'
+{{curr_cat=cat}}
+{{else:}}
+onclick="location='{{=URL(r=request, vars=dict(study=request.vars["study"], category=cat['_id']))}}';"
+{{pass}}
+>
+{{pass}}
+
+{{if cats.count()<3 :}}
+{{=A('Add category...' ,_href=URL(r=request, c='categories', f='edit',
+                                vars=dict(study=request.vars['study'])))}}
+{{pass}}
+
+{{if 'curr_cat' in globals():}}
+<div class="statusbar clearfix">
+    <h5 style='margin-top: 0;'> Category description:</h5>
+    <div class="breadcrumbs">{{=curr_cat['description']}}</div>
+    <span style="float: right;">
+{{=A('Edit category metadata', _href=URL(r=request, c="categories", f="edit", vars=request.vars))}} - 
+{{=A('delete', _href=URL(r=request, c="categories", f="delete", vars=request.vars))}}
+ </span>
+</div>
+<div style='clear: both;'> </div>
+<!--
+<script>
+	$(document).ready(function() {
+		$( "#factors" ).accordion();
+	});
+</script>
+-->
+<div id="factors">
+        {{for factor in factors:}} 
+        <h3 id='{{=factor['_id']}}-title'><a href="#">{{=factor['title']}}</a></h3>
+        <div id='{{=factor['_id']}}-div' class='factor-div'>
+           {{=LOAD(c='factors', f='show', args=[factor['_id']], ajax=True)}}
+        </div>
+        {{pass}}
+
+</div> 
+
+<br />
+<div id='add-factor'>
+    <form onsubmit="ajax('{{=URL(r=request, c='factors', f='add', vars=request.vars)}}', ['title'], ':eval'); return false;" >
+        Add a factor:
+        {{=INPUT(_name='title', _style='margin: 0 4px;')}}
+        {{=INPUT(_type='submit', _value='Submit')}}
+    </form>
+<div>
+
+
+{{pass}}

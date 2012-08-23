@@ -1,0 +1,38 @@
+{{_id = factor['_id']}}
+
+<span class='factor-editspan'> <a href='#'
+        onclick="ajax('{{=URL(c='factors', f='edit', args=[ _id, 'title'])}}', [], '{{=_id}}-title'); return false;"
+        > Edit factor metadata</a>
+- <a href='#'
+        onclick="ajax('{{=URL(c='factors', f='delete', args=[ _id])}}', [], '{{=_id}}-div'); $('#{{=_id}}-div').remove('');  $('#{{=_id}}-hx').remove('');  return false;"
+        >delete</a>
+</span>
+
+<div id='{{=_id}}-description' class='factor-description'>
+{{=LOAD(c='factors', f='show_field', args=[ _id, 'description'])}}
+</div>
+
+<div id='{{=_id}}-criteria' class='factor-criteria' >
+    <div class='field-label'> <label> Criteria: </label> </div>
+    <div class='field-content'>
+        {{for _cid, crit in enumerate(factor['criteria']):}}
+        <div id='{{=_id}}-criteria-{{=crit["_id"]}}'>
+            {{=LOAD(c='criteria', f='show', vars=dict(_id=_id, _cid=crit['_id']), ajax=True)}}
+        </div>
+        {{pass}}
+    {{=A('Add criterion', callback=URL(c='criteria', f='add', args=[_id]), target=':eval', _id='add-criteria-%s' % _id )}}
+    </div>
+    <div style='clear: both;'> </div>
+</div>
+
+<div id='{{=_id}}-algorithm_description' class='factor-algorithm_description'>
+{{=LOAD(c='factors', f='show_field', args=[ _id, 'algorithm_description'])}}
+</div>
+
+<div id='{{=_id}}-algorithm' class='factor-algorithm'>
+{{=LOAD(c='factors', f='show_field', args=[ _id, 'algorithm'])}}
+</div>
+
+<div id='{{=_id}}-default_weight' class='factor-default_weight'>
+{{=LOAD(c='factors', f='show_field', args=[ _id, 'default_weight'])}}
+</div>

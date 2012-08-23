@@ -1,0 +1,11 @@
+{{extend 'layout.html'}}
+
+<h1> Multifactor analysis </h1>
+
+<ol class='list-of-studies'>
+{{for el in rows:}}
+<li><b>{{=el['title']}}</b> 
+<a href='{{=URL(r=request, c="dataset", f="manage", vars=dict(study=str(el["_id"])))}}'>fill</a>
+</li>
+{{pass}}
+</ol>

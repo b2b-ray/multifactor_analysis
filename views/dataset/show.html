@@ -1,0 +1,117 @@
+<div>
+    <a href='#' onclick='ajax("{{=URL(c='dataset', f='add', vars=request.vars)}}", [], "test2"); return false;'>Add row</a>
+</div>
+
+<div id='test2'>
+</div>
+
+<br />
+<table cellpadding="0" cellspacing="0" border="0" width="100%" class="display" id="example" class='myDataTable'>
+    <thead>
+        <tr>
+            <th rowspan="2"> Element </th>
+            {{for el in factors:}} 
+                <th colspan="{{=len(el['criteria'])+1}}">{{=el['title']}}</th>
+            {{pass}}
+        </tr>
+        <tr>
+            {{factors.rewind()}}
+            {{for el in factors:}} 
+                {{for crit in el['criteria']:}}
+                <th>{{=crit['variable']}}</th>
+                {{pass}}
+                <th> rg </th>
+            {{pass}}
+            {{factors.rewind()}}
+        </tr>
+    <thead>
+    <tbody>
+        {{for dts in datasets:}}
+        <tr id='dts-{{=dts["_id"]}}'>
+            <td id='dts-{{=dts["_id"]}}-name' class='editable'> {{=dts['name']}} </td>
+            {{for factor in dts['factors']:}}
+                {{# This is really innefficent! }}
+                {{factor_struct = dbm.factors.find_one({"_id": factor['_id']})}}
+                {{if factor['category'] == ObjectId(request.vars.category):}}
+                    {{for crit_idx, crit in enumerate(factor['criteria']):}}
+                    <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-{{=crit["_id"]}}' class='editable {{=factor_struct["criteria"][crit_idx]["type"]}}'>{{=crit['value']}}</td>
+                    {{pass}}
+                    <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-rating' class="rating">{{=factor['rating']}}</td>
+                {{pass}}
+            {{pass}}    
+        </tr>
+        {{pass}}
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function() {
+        $.validator.addMethod(
+        "regex",
+        function(value, element, regexp) {
+            var re = new RegExp(regexp);
+            return this.optional(element) || re.test(value);
+        },
+        "Please check your input."
+);
+        /* Generating validators */
+        var validator_map = { 
+            {{mvalidator_map= dict(integer='number', string='required',float='number')}}
+            {{for el in factors:}} 
+                {{for crit in el['criteria']:}}
+                "{{=crit['_id']}}": {"{{=mvalidator_map[crit['type']]}}": true},
+                {{pass}}
+            {{pass}}
+        }
+
+        /* Init DataTables */
+        var oTable = $('#example').dataTable({
+                                "bJQueryUI": false,
+                                "bPaginate": false,
+                                "sScrollX": "100%",
+                                "sScrollXInner": "110%",
+                                "bScrollCollapse": true
+                                }
+);
+         
+        /* Apply the jEditable handlers to the table */
+        oTable.$('td.editable').editable('{{=URL(c="dataset", f="edit", vars=request.vars)}}', {
+            callback : function( sValue, y ) {
+                var aPos = oTable.fnGetPosition( this );
+                oTable.fnUpdate( sValue, aPos[0], aPos[1] );
+            },
+            submitdata: function ( value, settings ) {
+                return { };
+            },
+            width: "100%",
+            tooltip: "Edit",
+            placeholder : "",
+            errorPlacement: function(error, element) {
+                error.appendTo( element.parent("td").next("td") );
+            },
+            onsubmit: function(settings, td) {
+                var input = $(td).find('input');
+                $(this).validate({
+                rules: {
+                        'value': validator_map[$(td).attr('id').split('-')[3]]
+                        },
+                    });
+                return $(this).valid();
+                } ,
+
+        } );
+    } );
+
+
+    var giCount = 1;
+
+    function fnClickAddRow() {
+        $('#example').dataTable().fnAddData([ 
+        {{for el in range(width+1):}}
+        giCount ,
+        {{pass}}
+        ]); 
+        giCount++;
+    }
+
+</script>

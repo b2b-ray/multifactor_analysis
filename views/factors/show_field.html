@@ -1,0 +1,30 @@
+{{if field == 'title':}}
+    {{=A(factor['title'], _href="#")}}
+
+{{else:}}
+    <div class='field-label'>
+        {{=LABEL(field.capitalize().replace('_', ' '))}}:
+    </div>
+
+    <div class='field-content'>
+    {{if field == 'description':}}
+        <em>{{=factor['description']  or 'factor description goes here' }}</em>
+
+
+    {{elif field == 'algorithm':}}
+                {{=CODE(factor['algorithm'] or 'add total weight computation algorithm', language='python')}}
+
+    {{elif field == 'algorithm_description':}}
+                {{=factor['algorithm_description'] or 'describe the algorithm for computing influence of this factor '}}
+    {{elif field == 'default_weight':}}
+                {{=factor['default_weight']}}
+    {{pass}}
+    </div>
+
+    <div class='field-rightbar'>
+    <a href='#'
+        onclick="ajax('{{=URL(c='factors', f='edit', args=[ _id, field])}}', [], '{{=_id}}-{{=field}}'); return false;"
+        > Edit</a>
+    </div>
+    <div style='clear: both;'></div>
+{{pass}}
