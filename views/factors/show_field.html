@@ -10,14 +10,19 @@
     {{if field == 'description':}}
         <em>{{=factor['description']  or 'factor description goes here' }}</em>
 
-
     {{elif field == 'algorithm':}}
                 {{=CODE(factor['algorithm'] or 'add total weight computation algorithm', language='python')}}
 
     {{elif field == 'algorithm_description':}}
                 {{=factor['algorithm_description'] or 'describe the algorithm for computing influence of this factor '}}
+
+    {{elif field == 'variable':}}
+                {{=factor['variable']}}
+
+    {{elif field == 'rating_method':}}
+                {{=factor['rating_method']}}
     {{elif field == 'default_weight':}}
-                {{=factor['default_weight']}}
+                {{#=factor['default_weight']}}
     {{pass}}
     </div>
 

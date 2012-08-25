@@ -39,7 +39,10 @@ def edit():
     return dict(form=form)
 
 def delete():
-    out = dbm.studies.remove(ObjectId(request.vars['study']))
+    _id = ObjectId(request.vars['study'])
+    dbm.studies.remove(_id)
+    dbm.factors.remove({'study': _id})
+    dbm.dataset.remove({'study': _id})
     session.flash = 'Study deleted.'
     redirect(URL(r=request, f='index'))
 

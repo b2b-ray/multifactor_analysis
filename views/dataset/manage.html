@@ -22,8 +22,9 @@ onclick="location='{{=URL(r=request, vars=dict(study=request.vars["study"], cate
     <h5 style='margin-top: 0;'> Category description:</h5>
     <div class="breadcrumbs">{{=curr_cat['description']}}</div>
 </div>
-
+<div id='mdataset'>
 {{=LOAD(c='dataset', f='show', vars=request.vars, ajax=True)}}
+</div>
 {{pass}}
 
 

@@ -1,11 +1,6 @@
 <div>
-    <a href='#' onclick='ajax("{{=URL(c='dataset', f='add', vars=request.vars)}}", [], "test2"); return false;'>Add row</a>
+    <a href='#' onclick='ajax("{{=URL(c='dataset', f='add', vars=request.vars)}}", [], "mdataset"); return false;'>Add row</a>
 </div>
-
-<div id='test2'>
-</div>
-
-<br />
 <table cellpadding="0" cellspacing="0" border="0" width="100%" class="display" id="example" class='myDataTable'>
     <thead>
         <tr>
@@ -18,9 +13,9 @@
             {{factors.rewind()}}
             {{for el in factors:}} 
                 {{for crit in el['criteria']:}}
-                <th>{{=crit['variable']}}</th>
+                <th title='{{=crit["description"]}}'>{{=crit['variable']}}</th>
                 {{pass}}
-                <th> rg </th>
+                <th title='{{=el["algorithm"]}}'> rg </th>
             {{pass}}
             {{factors.rewind()}}
         </tr>
@@ -36,7 +31,8 @@
                     {{for crit_idx, crit in enumerate(factor['criteria']):}}
                     <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-{{=crit["_id"]}}' class='editable {{=factor_struct["criteria"][crit_idx]["type"]}}'>{{=crit['value']}}</td>
                     {{pass}}
-                    <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-rating' class="rating">{{=factor['rating']}}</td>
+                    <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-rating' class="rating
+                        {{if factor_struct['rating_method']== 'manual':}} editable{{pass}}">{{=factor['rating']}}</td>
                 {{pass}}
             {{pass}}    
         </tr>
@@ -56,7 +52,7 @@
 );
         /* Generating validators */
         var validator_map = { 
-            {{mvalidator_map= dict(integer='number', string='required',float='number')}}
+            {{mvalidator_map= {'':'required', 'integer':'number', 'string':'required','float':'number'} }}
             {{for el in factors:}} 
                 {{for crit in el['criteria']:}}
                 "{{=crit['_id']}}": {"{{=mvalidator_map[crit['type']]}}": true},
@@ -79,6 +75,13 @@
             callback : function( sValue, y ) {
                 var aPos = oTable.fnGetPosition( this );
                 oTable.fnUpdate( sValue, aPos[0], aPos[1] );
+                var mids = $(this).attr('id').split('-');
+                /* recompute rating if we are not editing the title   */
+                if ((mids[3] != 'rating') && (mids.length == 4)) { 
+                    mids = mids.slice(1,3); 
+                    console.log(ajax('{{=URL(c="dataset", f="recompute_rating")}}?dataset='+mids[0]+'&factor='+mids[1], [], ':eval'));
+                   
+                }
             },
             submitdata: function ( value, settings ) {
                 return { };

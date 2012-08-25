@@ -6,10 +6,15 @@ def index():
 def add():
     _id = ObjectId(request.args[0])
     _cid = ObjectId()
-    factor = dbm.factors.find_one({"_id": _id})
-    factor['criteria'].append({'_id': _cid, 'variable': '',
-        'type': '', 'description': '' })
-    dbm.factors.update( {'_id': _id}, factor)
+    dbm.factors.update( {'_id': _id}, {'$push':
+        { 'criteria': {'_id': _cid, 'variable': '',
+                    'type': '', 'description': '' }} })
+    factor = dbm.factors.find_one({'_id': _id})
+    dts = dbm.dataset.find_one({'study': factor['study']})
+    if dts:
+        factor_pos = argidx_dict(dts['factors'], _id)
+        dbm.dataset.update( {'study': factor['study']}, {"$push" : {
+            "factors.%s.criteria" % factor_pos: { '_id': _cid, 'value': ''} }}, multi=True)
     return "$('#add-criteria-%s').before('%s')" % ( _id,
             XML(DIV(LOAD(c='criteria', f='edit', vars=dict(_id=_id, _cid=_cid), ajax=True),
                 _id='%s-criteria-%s' % (_id, _cid))
@@ -21,11 +26,17 @@ def test():
 def delete():
     _id = ObjectId(request.vars._id)
     _cid = ObjectId(request.vars._cid)
-    factor = dbm.factors.find_one({"_id": _id})
-    criterion = filter(lambda x: x['_id'] == _cid,  factor['criteria'])[0]
-    _crit_idx = factor['criteria'].index(criterion)
-    del factor['criteria'][_crit_idx]
-    dbm.factors.update( {'_id': _id}, factor)
+
+    # remove criteria from factors
+    dbm.factors.update( {'_id': _id}, {'$pull' : {
+        "criteria" : { "_id": _cid} }})
+    # remove criteria from dataset
+    factor = dbm.factors.find_one({'_id': _id})
+    dts = dbm.dataset.find_one({'study': factor['study']})
+    if dts:
+        factor_pos = argidx_dict(dts['factors'], _id)
+        dbm.dataset.update( {'study': factor['study']}, {"$pull" : {
+            "factors.%s.criteria" % factor_pos: { '_id': _cid} }})
     return ''
 
 
@@ -38,9 +49,10 @@ def edit_internal():
     _cid = ObjectId(request.vars._cid)
 
     form = SQLFORM.factory(
-        Field('variable', 'string'),
+        Field('variable', 'string', requires=IS_MATCH(r'[a-z][a-z0-9]*',
+                            error_message='Should be matching [a-z][a-z0-9]*')),
         Field('description', 'string'),
-        Field('type', 'string', requires=IS_IN_SET(['integer', 'float', 'string'])),
+        Field('type', 'string', requires=IS_IN_SET([ 'string', 'integer', 'float'],zero=None)),
         Field('min_val', 'double'),
         Field('max_val', 'double'),
         _class='criterion'
@@ -57,11 +69,12 @@ def edit_internal():
                 for key in form.fields
                 if form.vars[key] is not None and key != '_id'}
         fvars['_id'] = criterion['_id']
-        factor['criteria'][_crit_idx] = fvars
-        dbm.factors.update( {'_id': _id}, factor)
+        #factor['criteria'][_crit_idx] = fvars
+        dbm.factors.update( {'_id': _id}, {'$set':\
+            {'criteria.%s' % _crit_idx : fvars}})
         session.flash = 'Success'
         return LOAD(c='criteria', f='show', vars=dict(_id=_id, _cid=_cid))
-    return form
+    return dict(form=form, _id=str(_id), _cid=str(_cid))
 
 def show():
     _id = ObjectId(request.vars._id)

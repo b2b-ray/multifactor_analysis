@@ -1,4 +1,16 @@
 {{extend 'layout.html'}}
-<h1> Study analysis </h1>
-{{=mplt.__dict__.keys()}}
-<img src='{{=URL(c="analyse", f="draw")}}.png' />
+
+<h1>Study: {{=study['title']}}</h1>
+<span style='float: right;'> 
+    <a href='{{=URL(r=request, c="studies", f="edit", vars=request.vars)}}'>Edit study metadata</a> -
+    <a href='{{=URL(r=request, c="studies", f="delete", vars=request.vars)}}'> delete </a>
+</span>
+
+<div class='study_description'> 
+    <em>{{=study['description']}}</em><br />
+</div>
+
+{{=LOAD(c='analyse', f='compare1factor', vars=request.vars)}}
+
+
+

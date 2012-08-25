@@ -1,0 +1,17 @@
+{{=form}}
+<script>
+$(document).ready(function(){
+   $('#{{=_id}}-criteria-{{=_cid}} #no_table_min_val__row').hide();
+   $('#{{=_id}}-criteria-{{=_cid}} #no_table_max_val__row').hide();
+    $('#{{=_id}}-criteria-{{=_cid}} #no_table_type').change(function(){
+       if (($(this).val() == 'integer') || ($(this).val() == 'float')) {
+           $('#{{=_id}}-criteria-{{=_cid}} #no_table_min_val__row').show();
+           $('#{{=_id}}-criteria-{{=_cid}} #no_table_max_val__row').show();
+        } else {
+           $('#{{=_id}}-criteria-{{=_cid}} #no_table_min_val__row').hide();
+           $('#{{=_id}}-criteria-{{=_cid}} #no_table_max_val__row').hide();
+       };
+
+   });
+});
+</script>

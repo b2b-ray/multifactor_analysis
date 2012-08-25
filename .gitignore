@@ -2,3 +2,7 @@
 cache/
 databases/
 cron/
+sessions/
+private/
+errors
+*.swp

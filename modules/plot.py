@@ -7,6 +7,11 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+from matplotlib import rc
+rc('text', usetex=False)
+
+
 
 def pcolor2d(title='title',xlab='x',ylab='y',
              z=[[1,2,3,4],[2,3,4,5],[3,4,5,6],[4,5,6,7]]):
@@ -18,6 +23,23 @@ def pcolor2d(title='title',xlab='x',ylab='y',
     if ylab: ax.set_ylabel(ylab)
     image=ax.imshow(z)
     image.set_interpolation('bilinear')
+    canvas=FigureCanvas(fig)
+    stream=cStringIO.StringIO()
+    canvas.print_png(stream)
+    return stream.getvalue()
+
+def plot1factor(d):
+    fig=Figure()
+    fig.set_facecolor('white')
+    ax=fig.add_subplot(111)
+    ax.set_title("Test")
+    ax.set_xlabel("companies")
+    ax.set_ylabel('test')
+    ax.bar(range(len(d)), d, align='center')
+    ax.set_xticks(range(len(d)))
+    #ax.set_xticklabels([unicode(el) for el in d.index], size='small', rotation='vertical')
+
+
     canvas=FigureCanvas(fig)
     stream=cStringIO.StringIO()
     canvas.print_png(stream)

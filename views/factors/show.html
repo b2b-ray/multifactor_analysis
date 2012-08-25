@@ -4,9 +4,13 @@
         onclick="ajax('{{=URL(c='factors', f='edit', args=[ _id, 'title'])}}', [], '{{=_id}}-title'); return false;"
         > Edit factor metadata</a>
 - <a href='#'
-        onclick="ajax('{{=URL(c='factors', f='delete', args=[ _id])}}', [], '{{=_id}}-div'); $('#{{=_id}}-div').remove('');  $('#{{=_id}}-hx').remove('');  return false;"
+        onclick="ajax('{{=URL(c='factors', f='delete', args=[ _id])}}', [], '{{=_id}}-div'); $('#{{=_id}}-div').remove('');  $('#{{=_id}}-title').remove('');  return false;"
         >delete</a>
 </span>
+
+<div id='{{=_id}}-variable' class='factor-variable'>
+{{=LOAD(c='factors', f='show_field', args=[ _id, 'variable'])}}
+</div>
 
 <div id='{{=_id}}-description' class='factor-description'>
 {{=LOAD(c='factors', f='show_field', args=[ _id, 'description'])}}
@@ -25,11 +29,16 @@
     <div style='clear: both;'> </div>
 </div>
 
+<div id='{{=_id}}-rating_method' class='factor-rating_method'>
+{{=LOAD(c='factors', f='show_field', args=[ _id, 'rating_method'])}}
+</div>
+
 <div id='{{=_id}}-algorithm_description' class='factor-algorithm_description'>
 {{=LOAD(c='factors', f='show_field', args=[ _id, 'algorithm_description'])}}
 </div>
 
-<div id='{{=_id}}-algorithm' class='factor-algorithm'>
+<div id='{{=_id}}-algorithm' class='factor-algorithm' 
+{{if factor['rating_method'] == 'manual':}} style='display: none;' {{pass}}>
 {{=LOAD(c='factors', f='show_field', args=[ _id, 'algorithm'])}}
 </div>
 

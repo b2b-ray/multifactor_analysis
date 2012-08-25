@@ -1,2 +1,15 @@
 {{=form}}
+{{if field == 'rating_method':}}
+<script>
+$(document).ready(function(){
+   $('#{{=_id}}-rating_method #no_table_rating_method').change(function(){
+       if ($(this).val() == 'algorithm') {
+            $('#{{=_id}}-algorithm').show();
+       } else {
+            $('#{{=_id}}-algorithm').hide();
+       };
+        });
+});
+</script>
+{{pass}}
 

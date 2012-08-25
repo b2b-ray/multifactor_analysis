@@ -15,8 +15,13 @@ def add():
     mvars['criteria'] = []
     mvars['algorithm_description'] = ''
     mvars['algorithm'] = ''
+    mvars['variable'] = ''
     mvars['default_weight'] = 0
+    mvars['rating_method'] = 'algorithm'
     _id = str(dbm.factors.insert(mvars))
+    dbm.dataset.update( {'study': mvars['study']}, {"$push" : {
+            'factors': {"_id": mvars['_id'], 'criteria': [],
+                'category': mvars['category'], 'rating': 0}}})
     return "$('#factors').append('%s')" % (XML(
             H3(A(mvars['title']),_id=_id+"-title"))+
             XML(DIV( LOAD(c='factors', f='show', args=[_id], ajax=True),
@@ -28,7 +33,12 @@ def show():
     return dict(factor=factor)
 
 def delete():
-    out = dbm.factors.remove(ObjectId(request.args[0]))
+    _id = ObjectId(request.args[0])
+    factor = dbm.factors.find_one({'_id': _id})
+    dbm.factors.remove(_id)
+    return str(dbm.dataset.update({'study': factor['study']},
+        {"$pull": { "factors": {"_id" : _id}}}, safe=True))
+
     return ''
 
 
@@ -43,6 +53,11 @@ def edit_internal():
     if field == 'description':
         form = SQLFORM.factory(
             Field('description', 'text', requires=IS_NOT_EMPTY()),
+            **defaults
+            )
+    if field == 'rating_method':
+        form = SQLFORM.factory(
+            Field('rating_method', 'string', requires=IS_IN_SET(['algorithm', 'manual'],zero=None)),
             **defaults
             )
     elif field == 'algorithm':
@@ -64,7 +79,13 @@ def edit_internal():
             )
     elif field == 'default_weight':
         form = SQLFORM.factory(
-            Field('default_weight', 'double'),
+            Field('default_weight', 'integer', requires=IS_FLOAT_IN_RANGE(0, 100)),
+            **defaults
+            )
+    elif field == 'variable':
+        form = SQLFORM.factory(
+            Field('variable', 'string', requires=IS_MATCH(r'[a-z][a-z0-9]+',
+                error_message='Should be matching [a-z][a-z0-9]+')),
             **defaults
             )
 
@@ -73,12 +94,13 @@ def edit_internal():
         form.vars.update({field: factor[field]})
     # checking if update
     if form.process().accepted:
-        factor[field] = form.vars[field]
-        margs = [ _id['_id'], field]
-        dbm.factors.update( _id, factor)
+        dbm.factors.update( _id, {"$set": { field: form.vars[field]}})
+        if field == 'algorithm':
+            LOAD(c='dataset', f='recompute_rating',
+                    vars=dict(factor=factor['_id'], silent=True))
         session.flash = 'Success'
-        return LOAD(c='factors', f='show_field', args=margs)
-    return dict(form=form, field=field)
+        return LOAD(c='factors', f='show_field', args=[ _id['_id'], field])
+    return dict(form=form, field=field, _id=str(factor['_id']))
 
 def show_field():
     _id = ObjectId(request.args[0])
