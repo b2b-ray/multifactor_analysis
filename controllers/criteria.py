@@ -65,9 +65,14 @@ def edit_internal():
     del form.vars['_id']
     # checking if update
     if form.process().accepted:
-        fvars = {key: form.vars[key]\
-                for key in form.fields
-                if form.vars[key] is not None and key != '_id'}
+	fvars = {}
+        for key in form.fields:
+            if form.vars[key] is not None and key != '_id':
+                fvars[key] = form.vars[key]
+	# dict comprehension not compatible with python2.6
+        #fvars = {key: form.vars[key]\
+        #        for key in form.fields\
+        #        if form.vars[key] is not None and key != '_id'}
         fvars['_id'] = criterion['_id']
         #factor['criteria'][_crit_idx] = fvars
         dbm.factors.update( {'_id': _id}, {'$set':\

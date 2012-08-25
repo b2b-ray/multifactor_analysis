@@ -71,7 +71,7 @@ from gluon.custom_import import track_changes; track_changes(True)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 import pymongo
-from bson.objectid import ObjectId
+from pymongo.objectid import ObjectId
 
 connection = pymongo.Connection()
 dbm = connection['b2b_ray_multifactor_analysis']
