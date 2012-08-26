@@ -36,7 +36,7 @@ def delete():
     if dts:
         factor_pos = argidx_dict(dts['factors'], _id)
         dbm.dataset.update( {'study': factor['study']}, {"$pull" : {
-            "factors.%s.criteria" % factor_pos: { '_id': _cid} }})
+            "factors.%s.criteria" % factor_pos: { '_id': _cid} }}, multi=True)
     return ''
 
 

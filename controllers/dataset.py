@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from applications.mfa.modules.restricted import createFunction
+from applications.market_segmentation.modules.restricted import createFunction
 
 def index():
     rows = dbm.studies.find()
