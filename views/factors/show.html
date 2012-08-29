@@ -21,7 +21,7 @@
     <div class='field-content'>
         {{for _cid, crit in enumerate(factor['criteria']):}}
         <div id='{{=_id}}-criteria-{{=crit["_id"]}}'>
-            {{=LOAD(c='criteria', f='show', vars=dict(_id=_id, _cid=crit['_id']), ajax=True)}}
+            {{=LOAD(c='criteria', f='show', vars=dict(_id=_id, _cid=crit['_id']))}}
         </div>
         {{pass}}
     {{=A('Add criterion', callback=URL(c='criteria', f='add', args=[_id]), target=':eval', _id='add-criteria-%s' % _id )}}

@@ -20,6 +20,11 @@ def plot1factor():
     d = mongo2pandas(dbm, request.vars.study)
     return mplt.plot1factor(d[factor_name])
 
+def compareNfactors():
+    study = ObjectId(request.vars.study)
+    factors = dbm.factors.find({'study': study})
+    return dict(factors=factors)
+
 
 def draw():
     return mplt.pcolor2d()
