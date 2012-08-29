@@ -158,4 +158,5 @@
 'state': 'состояние',
 'table': 'таблица',
 'unable to parse csv file': 'нечитаемый csv-файл',
+'value not in database': 'value not in database',
 }

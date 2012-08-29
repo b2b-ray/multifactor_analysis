@@ -1,5 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+from applications.market_segmentation.modules.restricted import createFunction
 
 def index():
     redirect(URL(r=request, c='default', f='index'))
@@ -62,14 +63,14 @@ def edit_internal():
             )
     elif field == 'algorithm':
         form = SQLFORM.factory(
-            Field('algorithm', 'text', requires=IS_NOT_EMPTY()),
+            Field('algorithm', 'text', requires=IS_VALID_PYTHON_ALGORITHM(_id)),
             col3 = {'algorithm': 'test'},
             **defaults
             )
     elif field == 'algorithm_description':
         form = SQLFORM.factory(
             Field('algorithm_description', 'text', requires=IS_NOT_EMPTY()),
-            col3 = {'algorithm_description': 'test'},
+            col3 = {'algorithm_description': 'Enter the algorithm here'},
             **defaults
             )
     elif field == 'title':
@@ -94,11 +95,17 @@ def edit_internal():
         form.vars.update({field: factor[field]})
     # checking if update
     if form.process().accepted:
+        if field == 'default_weight':
+            form.vars[field] = float(form.vars[field])
+        else:
+            form.vars[field] = form.vars[field].strip()
         dbm.factors.update( _id, {"$set": { field: form.vars[field]}})
         if field == 'algorithm':
-            LOAD(c='dataset', f='recompute_rating',
-                    vars=dict(factor=factor['_id'], silent=True))
-        session.flash = 'Success'
+            #LOAD(c='dataset', f='recompute_rating',
+            #        vars=dict(factor=factor['_id'], silent=True))
+            pass
+        else:
+            session.flash = 'Success'
         return LOAD(c='factors', f='show_field', args=[ _id['_id'], field])
     return dict(form=form, field=field, _id=str(factor['_id']))
 
@@ -109,3 +116,31 @@ def show_field():
 
     return dict(field=field, factor=factor, _id=_id)
 
+class IS_VALID_PYTHON_ALGORITHM(object):
+    def __init__(self, factor_id):
+        self.factor_id = factor_id
+    def __call__(self, value):
+        factor =  dbm.factors.find_one(self.factor_id)
+        crit_names = [crit['variable'] for crit in factor['criteria']]
+        try:
+            compute_rating = createFunction(value.strip(), ', '.join(crit_names))
+            return (value, None)
+        except Exception, e:
+            return (value, "Syntax error: " + str(e))
+    def formatter(self, value):
+        return value.strip()
+
+class RUN_TESTS_ON_FUNCTION(object):
+    def __init__(self, factor_id):
+        self.factor_id = factor_id
+    def __call__(self, value):
+        factor =  dbm.factors.find_one(self.factor_id)
+        criteria = factor['criteria']
+        crit_names = [crit['variable'] for crit in factor['criteria']]
+        try:
+            compute_rating = createFunction(value.strip(), ', '.join(crit_names))
+            return (value, None)
+        except Exception, e:
+            return (value, "Something is wrong in this algorithm: " + str(e))
+    def formatter(self, value):
+        return value.strip()

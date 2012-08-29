@@ -11,7 +11,7 @@
         <em>{{=factor['description']  or 'factor description goes here' }}</em>
 
     {{elif field == 'algorithm':}}
-                {{=CODE(factor['algorithm'] or 'add total weight computation algorithm', language='python')}}
+    {{response.write(CODE(factor['algorithm'] or 'add total weight computation algorithm', language='python').xml().replace('<br />',''), escape=False)}}
 
     {{elif field == 'algorithm_description':}}
                 {{=factor['algorithm_description'] or 'describe the algorithm for computing influence of this factor '}}

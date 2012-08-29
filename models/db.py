@@ -77,8 +77,12 @@ from gluon.custom_import import track_changes; track_changes(True)
 ## >>> rows=db(db.mytable.myfield=='value').select(db.mytable.ALL)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
+import sys
 import pymongo
-from pymongo.objectid import ObjectId
+if sys.version[:3] == '2.7':
+    from bson.objectid import ObjectId
+else:
+    from pymongo.objectid import ObjectId
 
 connection = pymongo.Connection()
 dbm = connection['b2b_ray_multifactor_analysis']
