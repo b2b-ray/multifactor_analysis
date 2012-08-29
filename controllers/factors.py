@@ -80,7 +80,7 @@ def edit_internal():
             )
     elif field == 'default_weight':
         form = SQLFORM.factory(
-            Field('default_weight', 'integer', requires=IS_FLOAT_IN_RANGE(0, 100)),
+            Field('default_weight', 'double', requires=IS_FLOAT_IN_RANGE(0, 100)),
             **defaults
             )
     elif field == 'variable':

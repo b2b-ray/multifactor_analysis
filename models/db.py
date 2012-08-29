@@ -15,8 +15,8 @@ db = DAL('sqlite://storage.sqlite')
 ## none otherwise. a pattern can be 'controller/function.extension'
 response.generic_patterns = ['*'] if request.is_local else []
 ## (optional) optimize handling of static files
-# response.optimize_css = 'concat,minify,inline'
-# response.optimize_js = 'concat,minify,inline'
+# response.optimize_css = 'concat,minify'#,inline'
+# response.optimize_js = 'concat,minify'#,inline'
 
 #########################################################################
 ## Here is sample code if you need for
@@ -46,6 +46,13 @@ mail.settings.login = 'noreply@b2b-ray.com:qpt7fdp0d'      # your credentials or
 auth.settings.registration_requires_verification = False
 auth.settings.registration_requires_approval = False
 auth.settings.reset_password_requires_verification = True
+auth.settings.create_user_groups = False
+
+# requireing login for all application
+
+if not auth.is_logged_in() and (request.controller != 'default'):
+    session.flash = 'You need to be logged in to access this page!'
+    redirect(URL(r=request, c='default', f='user', args=['login']))
 
 ## if you need to use OpenID, Facebook, MySpace, Twitter, Linkedin, etc.
 ## register with janrain.com, write your domain:api_key in private/janrain.key
@@ -80,4 +87,4 @@ else:
 connection = pymongo.Connection()
 dbm = connection['b2b_ray_multifactor_analysis']
 
-
+#session.flash = request.controller, request.function
