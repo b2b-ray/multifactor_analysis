@@ -63,12 +63,16 @@ def edit():
     return mvalue
 
 def recompute_rating():
+    import math
     factor_id = request.vars.factor
     dataset_id = request.vars.dataset
     factor =  dbm.factors.find_one({"_id": ObjectId(factor_id)})
     crit_names = [crit['variable'] for crit in factor['criteria']]
     code = str(factor['algorithm'])
-    compute_rating = createFunction(code, ', '.join(crit_names))
+    restricted_namespace = {'lincrit': lambda x, xm: min(x/(1.0*xm), 1),
+    'expcrit': lambda x, xm: min(1-math.exp(-3*x/(1.0*xm)), 1),
+    'powcrit': lambda x, xm: min((x/(1.0*xm))**2, 1)}
+    compute_rating = createFunction(code, ', '.join(crit_names), additional_symbols=restricted_namespace)
     if dataset_id is not None:
         q =  {"_id": ObjectId(dataset_id)}
     else:
