@@ -54,7 +54,8 @@ def manage():
 
     if 'category' in request.vars:
         factors = dbm.factors.find({'study': ObjectId(study['_id']),
-                         'category': ObjectId(request.vars['category'])})
+                    'category': ObjectId(request.vars['category'])}).sort(
+                            {'_id': 1})
         return dict(study=study, cats=cats, factors=factors)
     else:
         return dict(study=study, cats=cats)

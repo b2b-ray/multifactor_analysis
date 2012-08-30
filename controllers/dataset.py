@@ -14,14 +14,14 @@ def manage():
 
 def show():
     factors = dbm.factors.find({'study': ObjectId(request.vars.study),
-                'category': ObjectId(request.vars.category)})
+        'category': ObjectId(request.vars.category)}).sort({'_id': 1})
     width = sum([len(el['criteria'])+1 for el in factors])
     factors.rewind()
     datasets = dbm.dataset.find({'study': ObjectId(request.vars.study)})
     return dict(factors=factors, width=width, datasets=datasets)
 
 def add():
-    factors = dbm.factors.find({'study': ObjectId(request.vars.study)})
+    factors = dbm.factors.find({'study': ObjectId(request.vars.study)}).sort({'_id': 1})
     row = {'study': ObjectId(request.vars.study), 'factors': [], 'name': ''}
     for factor in factors:
         mf_row = {'rating': 0, 'category': factor['category'],
