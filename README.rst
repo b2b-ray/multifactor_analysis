@@ -7,7 +7,10 @@ Add description here...
 Dependencies:
 -------------
 
-  - web2py
-  - MongoDB
-  - 
+* >=python-2.6
+* web2py
+* MongoDB
+* pandas
+* matplotlib
+
 
