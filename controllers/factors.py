@@ -22,7 +22,7 @@ def add():
     _id = str(dbm.factors.insert(mvars))
     dbm.dataset.update( {'study': mvars['study']}, {"$push" : {
             'factors': {"_id": mvars['_id'], 'criteria': [],
-                'category': mvars['category'], 'rating': 0}}})
+                'category': mvars['category'], 'rating': 0}}}, multi=True)
     return "$('#factors').append('%s')" % (XML(
             H3(A(mvars['title']),_id=_id+"-title"))+
             XML(DIV( LOAD(c='factors', f='show', args=[_id], ajax=True),
@@ -85,8 +85,8 @@ def edit_internal():
             )
     elif field == 'variable':
         form = SQLFORM.factory(
-            Field('variable', 'string', requires=IS_MATCH(r'[a-z][a-z0-9]+',
-                error_message='Should be matching [a-z][a-z0-9]+')),
+            Field('variable', 'string', requires=IS_MATCH(r'[A-Za-z][A-Za-z0-9_]+$',
+                error_message='Should be matching [A-Za-z][A-Za-z0-9_]+')),
             **defaults
             )
 
@@ -122,13 +122,14 @@ class IS_VALID_PYTHON_ALGORITHM(object):
     def __call__(self, value):
         factor =  dbm.factors.find_one(self.factor_id)
         crit_names = [crit['variable'] for crit in factor['criteria']]
+	value = value.replace('\r\n', '\n')
         try:
-            compute_rating = createFunction(value.strip(), ', '.join(crit_names))
+            compute_rating = createFunction(value, ', '.join(crit_names))
             return (value, None)
         except Exception, e:
             return (value, "Syntax error: " + str(e))
     def formatter(self, value):
-        return value.strip()
+        return value.replace('\r\n', '\n')
 
 class RUN_TESTS_ON_FUNCTION(object):
     def __init__(self, factor_id):

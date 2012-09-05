@@ -49,10 +49,10 @@ def edit_internal():
     _cid = ObjectId(request.vars._cid)
 
     form = SQLFORM.factory(
-        Field('variable', 'string', requires=IS_MATCH(r'[a-z][a-z0-9]*',
-                            error_message='Should be matching [a-z][a-z0-9]*')),
+        Field('variable', 'string', requires=IS_MATCH(r'[A-Za-z][A-Za-z0-9_]*$',
+                            error_message='Should be matching [A-Za-z][A-Za-z0-9_]*')),
         Field('description', 'string'),
-        Field('type', 'string', requires=IS_IN_SET([ 'string', 'integer', 'float'],zero=None)),
+        Field('type', 'string', requires=IS_IN_SET([ 'string', 'integer', 'float'], zero=None)),
         Field('min_val', 'double'),
         Field('max_val', 'double'),
         _class='criterion'

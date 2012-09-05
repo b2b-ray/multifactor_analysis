@@ -20,8 +20,16 @@ for k in __bi:
         SAFE_SYMBOLS.append(k)
 del __bi
 
+from scipy.stats import gmean
+from numpy import mean
 
-def createFunction(sourceCode, args="", additional_symbols=dict()):
+restricted_namespace = {'lincrit': lambda x, xm: min(x/(1.0*xm), 1),
+	'gmean': gmean,
+	'amean': mean
+	}
+
+
+def createFunction(sourceCode, args="", additional_symbols=restricted_namespace):
   """
   Create a python function from the given source code
 

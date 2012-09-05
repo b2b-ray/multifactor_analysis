@@ -2,6 +2,10 @@
 # -*- coding: utf-8 -*-
 from applications.market_segmentation.modules.restricted import createFunction
 
+convert_val = {'integer': lambda x: int(x or 0) ,
+	'float': lambda x: float(x or 0),
+	'string': str}
+
 def index():
     rows = dbm.studies.find()
     return dict(rows=rows)
@@ -14,14 +18,14 @@ def manage():
 
 def show():
     factors = dbm.factors.find({'study': ObjectId(request.vars.study),
-        'category': ObjectId(request.vars.category)}).sort({'_id': 1})
+        'category': ObjectId(request.vars.category)}, sort=[('_id', 1)])
     width = sum([len(el['criteria'])+1 for el in factors])
     factors.rewind()
     datasets = dbm.dataset.find({'study': ObjectId(request.vars.study)})
     return dict(factors=factors, width=width, datasets=datasets)
 
 def add():
-    factors = dbm.factors.find({'study': ObjectId(request.vars.study)}).sort({'_id': 1})
+    factors = dbm.factors.find({'study': ObjectId(request.vars.study)}, sort = [('_id', 1)])
     row = {'study': ObjectId(request.vars.study), 'factors': [], 'name': ''}
     for factor in factors:
         mf_row = {'rating': 0, 'category': factor['category'],
@@ -53,9 +57,8 @@ def edit():
             # we want to change one of the criteria
             crit_pos = argidx_dict(dts['factors'][factor_pos]['criteria'],
                                                         criterion_id)
-            convert = {'integer': int , 'float': float, 'string': str}
             mcrit_type = factor['criteria'][crit_pos]['type']
-            mvalue = convert[mcrit_type](request.vars.value)
+            mvalue = convert_val[mcrit_type](request.vars.value)
             q = 'factors.%s.criteria.%s.value' % (factor_pos, crit_pos)
     dbm.dataset.update({'_id': ObjectId(dataset_id)},
         {"$set": { q : mvalue }})
@@ -69,10 +72,7 @@ def recompute_rating():
     factor =  dbm.factors.find_one({"_id": ObjectId(factor_id)})
     crit_names = [crit['variable'] for crit in factor['criteria']]
     code = str(factor['algorithm'])
-    restricted_namespace = {'lincrit': lambda x, xm: min(x/(1.0*xm), 1),
-    'expcrit': lambda x, xm: min(1-math.exp(-3*x/(1.0*xm)), 1),
-    'powcrit': lambda x, xm: min((x/(1.0*xm))**2, 1)}
-    compute_rating = createFunction(code, ', '.join(crit_names), additional_symbols=restricted_namespace)
+    compute_rating = createFunction(code, ', '.join(crit_names))
     if dataset_id is not None:
         q =  {"_id": ObjectId(dataset_id)}
     else:
@@ -86,11 +86,11 @@ def recompute_rating():
         args = {}
         for crit_def, crit in zip(\
                 factor['criteria'], dts['factors'][factor_pos]['criteria']):
-            args[crit_def['variable']] =  crit['value']
-        rating =  compute_rating(**args)
+            args[crit_def['variable']] =  convert_val[crit_def['type']](crit['value'])
+        rating =  float(compute_rating(**args))
         dbm.dataset.update({'_id': dataset_id},
                 {"$set": {'factors.%s.rating' % factor_pos : rating}})
-        out += "$('td#dts-%s-%s-rating').text(%s); " % (dataset_id, factor_id, rating)
+        out += "$('td#dts-%s-%s-rating').text(%.3g); " % (dataset_id, factor_id, rating)
     if request.vars.silent is None:
         return out
     else:

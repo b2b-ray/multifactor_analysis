@@ -23,8 +23,8 @@
     <tbody>
         {{for dts in datasets:}}
         <tr id='dts-{{=dts["_id"]}}'>
-            <td id='dts-{{=dts["_id"]}}-name' class='editable'> {{=dts['name']}} </td>
-            {{for factor in dts['factors']:}}
+            <td id='dts-{{=dts["_id"]}}-name' class='editable'>{{=dts['name']}}</td>
+            {{for factor in sorted(dts['factors'], key=lambda el: el['_id']):}}
                 {{# This is really innefficent! }}
                 {{factor_struct = dbm.factors.find_one({"_id": factor['_id']})}}
                 {{if factor['category'] == ObjectId(request.vars.category):}}
@@ -32,7 +32,7 @@
                     <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-{{=crit["_id"]}}' class='editable {{=factor_struct["criteria"][crit_idx]["type"]}}'>{{=crit['value']}}</td>
                     {{pass}}
                     <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-rating' class="rating
-                        {{if factor_struct['rating_method']== 'manual':}} editable{{pass}}">{{=factor['rating']}}</td>
+			{{if  factor_struct['rating_method']== 'manual':}} editable{{pass}}">{{='%.3g' % factor['rating']}}</td>
                 {{pass}}
             {{pass}}    
         </tr>
@@ -67,10 +67,12 @@
                                 "sScrollX": "100%",
                                 "bScrollCollapse": true
                                 }
-);
+	);
+	/* var header_oTable = new FixedColumns( oTable ); */
+	
          
         /* Apply the jEditable handlers to the table */
-        oTable.$('td.editable').editable('{{=URL(c="dataset", f="edit", vars=request.vars)}}', {
+        $('td.editable').editable('{{=URL(c="dataset", f="edit", vars=request.vars)}}', {
             callback : function( sValue, y ) {
                 var aPos = oTable.fnGetPosition( this );
                 oTable.fnUpdate( sValue, aPos[0], aPos[1] );
@@ -88,9 +90,6 @@
             width: "100%",
             tooltip: "Edit",
             placeholder : "",
-            errorPlacement: function(error, element) {
-                error.appendTo( element.parent("td").next("td") );
-            },
             onsubmit: function(settings, td) {
                 var input = $(td).find('input');
                 $(this).validate({
@@ -101,8 +100,9 @@
                 return $(this).valid();
                 } ,
 
-        } );
+	} ); 
     } );
+
 
 
     var giCount = 1;

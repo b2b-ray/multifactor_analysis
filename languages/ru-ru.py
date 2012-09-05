@@ -99,6 +99,7 @@
 'Rows selected': 'Выделено строк',
 'Semantic': 'Semantic',
 'Services': 'Services',
+'Should be matching [A-Za-z][A-Za-z0-9_]+': 'Should be matching [A-Za-z][A-Za-z0-9_]+',
 'Should be matching [a-z][a-z0-9]*': 'Should be matching [a-z][a-z0-9]*',
 'Should be matching [a-z][a-z0-9]+': 'Should be matching [a-z][a-z0-9]+',
 'Stylesheet': 'Stylesheet',
