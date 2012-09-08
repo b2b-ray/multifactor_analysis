@@ -10,8 +10,8 @@ response.subtitle = ''
 
 ## read more at http://dev.w3.org/html5/markup/meta.name.html
 response.meta.author = 'B2B Ray <root@b2b-ray.com>'
-response.meta.description = 'a cool new app'
-response.meta.keywords = 'web2py, python, framework'
+response.meta.description = 'multifactror analysis application'
+response.meta.keywords = 'marketing, B2B, multifactor analysis'
 response.meta.copyright = 'Copyright 2011'
 
 ## your http://google.com/analytics id
@@ -34,6 +34,7 @@ response.menu = [
 ## provide shortcuts for development. remove in production
 #########################################################################
 
+# I honestly don't know where this function gets called.
 def _():
     # shortcuts
     app = request.application

@@ -3,9 +3,13 @@
 from applications.market_segmentation.modules.restricted import createFunction
 
 def index():
+    """Just some default page
+    """
     redirect(URL(r=request, c='default', f='index'))
 
 def add():
+    """Add a new factor.
+    """
     mvars = request.vars
     for key in ['study', 'category']:
         mvars[key] = ObjectId(mvars[key])
@@ -20,6 +24,8 @@ def add():
     mvars['default_weight'] = 0
     mvars['rating_method'] = 'algorithm'
     _id = str(dbm.factors.insert(mvars))
+    # now make sure that corresponding fields are allso inserted into 
+    # the dataset collection
     dbm.dataset.update( {'study': mvars['study']}, {"$push" : {
             'factors': {"_id": mvars['_id'], 'criteria': [],
                 'category': mvars['category'], 'rating': 0}}}, multi=True)
@@ -30,33 +36,40 @@ def add():
                 )).replace( "'", r"\'").replace('\n', ' '),
 
 def show():
+    """Show a factor
+    """
     factor = dbm.factors.find_one({'_id': ObjectId(request.args[0])})
     return dict(factor=factor)
 
 def delete():
+    """Delete a factor
+    """
     _id = ObjectId(request.args[0])
     factor = dbm.factors.find_one({'_id': _id})
     dbm.factors.remove(_id)
     return str(dbm.dataset.update({'study': factor['study']},
         {"$pull": { "factors": {"_id" : _id}}}, safe=True))
 
-    return ''
-
-
 def edit():
+    """ Edit factor frontend
+    """
     return LOAD(c='factors', f='edit_internal', args=request.args,
                         vars=request.vars, ajax=True)
 
 def edit_internal():
+    """ This is the routine where all the actual work is done on editing
+    """
     _id = {'_id' : ObjectId(request.args[0])}
     field = request.args[1]
     defaults = {'_class': field}
+    # switch case structure to create the correct FORM
+    # depending on the name of field we want to edit
     if field == 'description':
         form = SQLFORM.factory(
             Field('description', 'text', requires=IS_NOT_EMPTY()),
             **defaults
             )
-    if field == 'rating_method':
+    elif field == 'rating_method':
         form = SQLFORM.factory(
             Field('rating_method', 'string', requires=IS_IN_SET(['algorithm', 'manual'],zero=None)),
             **defaults
@@ -91,6 +104,7 @@ def edit_internal():
             )
 
     factor = dbm.factors.find_one(_id)
+    # prepopulate form with values from the database
     if field in factor:
         form.vars.update({field: factor[field]})
     # checking if update
@@ -110,10 +124,11 @@ def edit_internal():
     return dict(form=form, field=field, _id=str(factor['_id']))
 
 def show_field():
+    """Show a field
+    """
     _id = ObjectId(request.args[0])
     field = request.args[1]
     factor = dbm.factors.find_one({'_id': _id})
-
     return dict(field=field, factor=factor, _id=_id)
 
 class IS_VALID_PYTHON_ALGORITHM(object):
@@ -131,16 +146,30 @@ class IS_VALID_PYTHON_ALGORITHM(object):
     def formatter(self, value):
         return value.replace('\r\n', '\n')
 
+
+def test_algorithm():
+    _id = ObjectId(request.args[0])
+    factor =  dbm.factors.find_one({"_id": _id})
+    crit_names = [crit['variable'] for crit in factor['criteria']]
+    value = factor['algorithm'].replace('\r\n', '\n')
+    try:
+	compute_rating = createFunction(value, ', '.join(crit_names))
+	args = {}
+	test_values = {"integer": 1, "float": 1.2, "string": 'testfd,fd'}
+	for crit in factor['criteria']:
+	    args[crit['variable']] = test_values[crit['type']]
+	compute_rating(**args)
+	return 0
+    except Exception, e:
+	return "AlgorithmError: " + str(e)
+
+
+
 class RUN_TESTS_ON_FUNCTION(object):
     def __init__(self, factor_id):
         self.factor_id = factor_id
     def __call__(self, value):
-        factor =  dbm.factors.find_one(self.factor_id)
-        criteria = factor['criteria']
-        crit_names = [crit['variable'] for crit in factor['criteria']]
         try:
-            compute_rating = createFunction(value.strip(), ', '.join(crit_names))
-            return (value, None)
         except Exception, e:
             return (value, "Something is wrong in this algorithm: " + str(e))
     def formatter(self, value):

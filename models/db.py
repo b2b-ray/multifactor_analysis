@@ -39,8 +39,8 @@ auth.define_tables()
 mail=auth.settings.mailer
 mail.settings.server = 'smtp.googlemail.com'  # your SMTP server
 mail.settings.sender = 'B2B-Ray [server]'         # your email
+# the following line should not be commited to github
 mail.settings.login = 'noreply@b2b-ray.com:qpt7fdp0d'      # your credentials or None
-
 
 ## configure auth policy
 auth.settings.registration_requires_verification = False
@@ -49,7 +49,6 @@ auth.settings.reset_password_requires_verification = True
 auth.settings.create_user_groups = False
 
 # requireing login for all application
-
 if not auth.is_logged_in() and (request.controller != 'default'):
     session.flash = 'You need to be logged in to access this page!'
     redirect(URL(r=request, c='default', f='user', args=['login']))
@@ -78,6 +77,8 @@ from gluon.custom_import import track_changes; track_changes(True)
 ## >>> for row in rows: print row.id, row.myfield
 #########################################################################
 import sys
+
+# initializing MongoDB
 import pymongo
 if sys.version[:3] == '2.7':
     from bson.objectid import ObjectId
@@ -87,4 +88,3 @@ else:
 connection = pymongo.Connection()
 dbm = connection['b2b_ray_multifactor_analysis']
 
-#session.flash = request.controller, request.function
