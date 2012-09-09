@@ -3,7 +3,7 @@
 <h1>Study: {{=study['title']}}</h1>
 <span style='float: right;'> 
     <a href='{{=URL(r=request, c="studies", f="edit", vars=request.vars)}}'>Edit study metadata</a> -
-    <a href='{{=URL(r=request, c="studies", f="delete", vars=request.vars)}}'> delete </a>
+    <!--   <a href='{{=URL(r=request, c="studies", f="delete", vars=request.vars)}}'> delete </a> -->
 </span>
 
 <div class='study_description'> 
@@ -32,9 +32,10 @@ onclick="location='{{=URL(r=request, vars=dict(study=request.vars["study"], cate
     <div class="breadcrumbs">{{=curr_cat['description']}}</div>
     <span style="float: right;">
 {{=A('Edit category metadata', _href=URL(r=request, c="categories", f="edit", vars=request.vars))}} - 
-{{=A('delete', _href=URL(r=request, c="categories", f="delete", vars=request.vars))}}
+{{#=A('delete', _href=URL(r=request, c="categories", f="delete", vars=request.vars))}}
  </span>
 </div>
+{{=LOAD(c='dataset', f='check_factor_consitency', vars=request.vars, ajax=True)}}
 <div style='clear: both;'> </div>
 <!--
 <script>

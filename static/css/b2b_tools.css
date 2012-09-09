@@ -53,4 +53,24 @@ table.display tr.even td.rating {
         background-color: #ffeeee;
 }
 
+.dataset_has_errors{
+    background-color: #FFE9E8;
+}
+
+.dataset_passed{
+    background-color: #EEFEEE;
+}
+
+.dataset_error_message div{
+    padding-left: 20px;
+}
+
+.dataset_error_message ul{
+    padding-left: 20px;
+}
+
+
+.dataset_error_message ul b{
+   font-weight: bold; 
+}
 

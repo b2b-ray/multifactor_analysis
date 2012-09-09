@@ -1,0 +1,40 @@
+
+<div class='statusbar clearfix dataset_error_message {{=passed and "dataset_passed" or "dataset_has_errors"}}'>
+    {{if passed:}}
+	<h3> The dataset structure is consistent
+		    {{=IMG(_src=URL('static', 'images/ok_icon.png'), _style='width: 20px;')}}
+	</h3>
+    {{else:}}
+	<h3> There are some inconsistencies in dataset structure you entered </h4>
+
+	<div>
+	{{for f in factors:}}
+	    <h4>{{=f['title']}}
+	    {{if not f['errors']:}}
+		{{=IMG(_src=URL('static', 'images/ok_icon.png'), _style='width: 20px;')}}
+	    {{pass}}
+	    </h4>
+	    {{if f['errors']:}}
+		<ul>
+		{{for e in f['errors']:}}
+		    <li>
+		    {{=IMG(_src=URL('static', 'images/%s_icon.png' % e[0]), _style='width: 20px;')}}
+		      {{=e[1]}}
+		    </li>
+		{{pass}}
+		</ul>
+	    {{pass}}
+	{{pass}}
+	<br />
+
+	Please correct those errors 
+	{{if within_dataset is not None:}}
+	{{murl = URL(c='studies', f='manage', vars=mvars)}}
+	<a href="{{=murl}}" onclick="window.open('{{=murl}}'); return false;" target="_blank">here</a>
+	{{pass}}
+	and reload this page... 
+	</div>
+    {{pass}}
+</div>
+
+

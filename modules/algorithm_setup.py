@@ -20,12 +20,28 @@ for k in __bi:
         SAFE_SYMBOLS.append(k)
 del __bi
 
-from scipy.stats import gmean
-from numpy import mean
+import scipy.stats
+import numpy as np
+import re
+
+#=============================================================================#
+# Defining functions here that you want to be visible in the restricted
+# namespace
+#=============================================================================#
+
+# redefining basic arguments with more explicit error messages
+def amean(x):
+    return np.mean(x)
+
+def gmean(x):
+    return scipt.stats.gmean(x)
+
+
+#=============================================================================#
 
 restricted_namespace = {'lincrit': lambda x, xm: min(x/(1.0*xm), 1),
 	'gmean': gmean,
-	'amean': mean
+	'amean': amean
 	}
 
 
@@ -123,3 +139,85 @@ def createFunction(sourceCode, args="", additional_symbols=restricted_namespace)
   # Attach the actual source code to the docstring
   fct.__doc__ = sourceCode
   return fct
+
+class AlgorithmWrapper(object):
+    """ This is a algorithm wrapper that has multiples uses:
+        * as a validator in FORMS
+	* used to compute the rating from given criterias values
+    """
+    def __init__(self, factor, session=None):
+	self.factor = factor
+        self.crit_names = [crit['variable'] for crit in self.factor['criteria']]
+	self.factor['algorithm'] = self.factor['algorithm'].replace('\r\n', '\n')
+	self.session = session
+
+    def __call__(self, value=None):
+	""" Method required for validation.
+	Warning: the input and return arguments should not be changed!
+	Parameters:
+	-----------
+	  - value: str :  string containing the algorithm
+	"""
+	if value is None:
+	    value = self.factor['algorithm']
+	value = value.replace('\r\n', '\n')
+        try:
+	    # following line fails if there is a syntax problem
+            self.f = createFunction(value, ', '.join(self.crit_names))
+	    args = self.prepare_args()
+	    # this raises an exeption for any other errors
+	    self.f(**args)
+            return (value, None)
+        except Exception, e:
+	    e = str(e)
+	    SyntaxError_regexp = re.compile(r'\(<string>, line (?P<n>\d+)\)')
+	    linenum = re.search(SyntaxError_regexp, e)
+	    if linenum:
+		e = re.sub(SyntaxError_regexp, ' at line %d' %\
+			(int(linenum.group('n')) - 1), e)
+            return (value, "AlgorithmError: " + e)
+    def prepare_args(self, args=None):
+	"""
+	This methods converts arguments to correct type.
+	If args is None it some typical values are generated
+	"""
+	conversions = {'integer': lambda x: int(x or 0) ,
+		  	'float': lambda x: float(x or 0),
+			'string': str}
+	test_values = {'integer': 1,
+		       'float': 1.2,
+		       'string': 'Erd dsf, ds '}
+	if args is not None:
+	    for key in args:
+		args[key] = conversions[self.factor]
+	else:
+	    args = {}
+	    for crit in self.factor['criteria']:
+		key = crit['variable']
+		_type = crit['type']
+		args[key] = test_values[_type]
+	return args
+
+
+
+
+    def formatter(self, value):
+	""" Method required for validation, should not be changed """
+        return value.replace('\r\n', '\n')
+
+def test_algorithm():
+    _id = ObjectId(request.args[0])
+    factor =  dbm.factors.find_one({"_id": _id})
+    crit_names = [crit['variable'] for crit in factor['criteria']]
+    value = factor['algorithm'].replace('\r\n', '\n')
+    try:
+	compute_rating = createFunction(value, ', '.join(crit_names))
+	args = {}
+	test_values = {"integer": 1, "float": 1.2, "string": 'testfd,fd'}
+	for crit in factor['criteria']:
+	    args[crit['variable']] = test_values[crit['type']]
+	compute_rating(**args)
+	return 0
+    except Exception, e:
+	return "AlgorithmError: " + str(e)
+

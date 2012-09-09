@@ -23,7 +23,10 @@ onclick="location='{{=URL(r=request, vars=dict(study=request.vars["study"], cate
     <div class="breadcrumbs">{{=curr_cat['description']}}</div>
 </div>
 <div id='mdataset'>
-{{=LOAD(c='dataset', f='show', vars=request.vars, ajax=True)}}
+{{mvars = dict(request.vars)}}
+{{mvars['redirect_to_dataset'] = True}}
+{{mvars['ignore_warnings'] = True}}
+{{=LOAD(c='dataset', f='check_factor_consitency', vars=mvars, ajax=True)}}
 </div>
 {{pass}}
 

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from applications.market_segmentation.modules.restricted import createFunction
+from applications.market_segmentation.modules.algorithm_setup import AlgorithmWrapper
+
 
 def index():
     """Just some default page
@@ -71,12 +72,14 @@ def edit_internal():
             )
     elif field == 'rating_method':
         form = SQLFORM.factory(
-            Field('rating_method', 'string', requires=IS_IN_SET(['algorithm', 'manual'],zero=None)),
+            Field('rating_method', 'string',\
+		requires=IS_IN_SET(['algorithm', 'manual'],zero=None)),
             **defaults
             )
     elif field == 'algorithm':
         form = SQLFORM.factory(
-            Field('algorithm', 'text', requires=IS_VALID_PYTHON_ALGORITHM(_id)),
+            Field('algorithm', 'text',\
+		requires=AlgorithmWrapper(dbm.factors.find_one(_id), session)),
             col3 = {'algorithm': 'test'},
             **defaults
             )
@@ -130,47 +133,3 @@ def show_field():
     field = request.args[1]
     factor = dbm.factors.find_one({'_id': _id})
     return dict(field=field, factor=factor, _id=_id)
-
-class IS_VALID_PYTHON_ALGORITHM(object):
-    def __init__(self, factor_id):
-        self.factor_id = factor_id
-    def __call__(self, value):
-        factor =  dbm.factors.find_one(self.factor_id)
-        crit_names = [crit['variable'] for crit in factor['criteria']]
-	value = value.replace('\r\n', '\n')
-        try:
-            compute_rating = createFunction(value, ', '.join(crit_names))
-            return (value, None)
-        except Exception, e:
-            return (value, "Syntax error: " + str(e))
-    def formatter(self, value):
-        return value.replace('\r\n', '\n')
-
-
-def test_algorithm():
-    _id = ObjectId(request.args[0])
-    factor =  dbm.factors.find_one({"_id": _id})
-    crit_names = [crit['variable'] for crit in factor['criteria']]
-    value = factor['algorithm'].replace('\r\n', '\n')
-    try:
-	compute_rating = createFunction(value, ', '.join(crit_names))
-	args = {}
-	test_values = {"integer": 1, "float": 1.2, "string": 'testfd,fd'}
-	for crit in factor['criteria']:
-	    args[crit['variable']] = test_values[crit['type']]
-	compute_rating(**args)
-	return 0
-    except Exception, e:
-	return "AlgorithmError: " + str(e)
-
-
-
-class RUN_TESTS_ON_FUNCTION(object):
-    def __init__(self, factor_id):
-        self.factor_id = factor_id
-    def __call__(self, value):
-        try:
-        except Exception, e:
-            return (value, "Something is wrong in this algorithm: " + str(e))
-    def formatter(self, value):
-        return value.strip()
