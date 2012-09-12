@@ -49,7 +49,7 @@ def delete():
     factor = dbm.factors.find_one({'_id': _id})
     dbm.factors.remove(_id)
     return str(dbm.dataset.update({'study': factor['study']},
-        {"$pull": { "factors": {"_id" : _id}}}, safe=True))
+        {"$pull": { "factors": {"_id" : _id}}}, multi=True))
 
 def edit():
     """ Edit factor frontend
@@ -118,9 +118,8 @@ def edit_internal():
             form.vars[field] = form.vars[field].strip()
         dbm.factors.update( _id, {"$set": { field: form.vars[field]}})
         if field == 'algorithm':
-            #LOAD(c='dataset', f='recompute_rating',
-            #        vars=dict(factor=factor['_id'], silent=True))
-            pass
+            LOAD(c='dataset', f='recompute_rating',
+                    vars=dict(factor=factor['_id'], silent=True))
         else:
             session.flash = 'Success'
         return LOAD(c='factors', f='show_field', args=[ _id['_id'], field])

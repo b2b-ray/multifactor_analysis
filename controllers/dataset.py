@@ -11,6 +11,20 @@ def index():
     return dict(rows=rows)
 
 def manage():
+    _append_files = [
+      'js/jquery.dataTables.min.js',
+      'css/jquery.dataTables.css',
+      'css/jquery.dataTables_themeroller.css',
+      'css/demo_table.css',
+      'css/demo_table_jui.css',
+      'js/jquery.jeditable.mini.js',
+      'js/jquery.validate.js',
+      'js/FixedColumns.min.js',
+      'js/TableTools.min.js',
+      'css/TableTools.css',
+      ]
+    for f in _append_files:
+	response.files.append(URL('static', f))
     study = dbm.studies.find_one({'_id': ObjectId(request.vars['study'])})
 
     cats = dbm.categories.find({'study': study['_id']})

@@ -74,3 +74,11 @@ table.display tr.even td.rating {
    font-weight: bold; 
 }
 
+
+.mplt_plot {
+    width: 97%;
+}
+
+.mplt_plot img{
+    width: 100%;
+}

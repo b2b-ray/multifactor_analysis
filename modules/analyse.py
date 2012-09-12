@@ -2,7 +2,11 @@
 # -*- coding: utf-8 -*-
 import pandas
 import numpy as np
-from bson.objectid import ObjectId
+import sys
+if sys.version[:3] == '2.7':
+    from bson.objectid import ObjectId
+else:
+    from pymongo.objectid import ObjectId
 
 def mongo2pandas(dbm, study, mfilter={}):
     _sid = ObjectId(study)
@@ -13,13 +17,14 @@ def mongo2pandas(dbm, study, mfilter={}):
 
     d = pandas.DataFrame(
             columns=[el['variable'] for el in dbm.factors.find(q_factors)],
-            index=[el['name'] for el in dbm.dataset.find({'study': _sid})],
+            index=[el['name'] for el in dbm.dataset.find({'study': _sid},
+				    sort=[('_id',1)])],
             dtype=object)
     for dts in dbm.dataset.find(q_dts):
         idx = 0
         for factor in dts['factors']:
             if all([factor[key] == mfilter[key] for key in mfilter]):
-                d[d.columns[idx]][dts['name']] = factor['rating']
+		d[d.columns[idx]][dts['name']] = factor['rating']
                 idx += 1
     return d
 

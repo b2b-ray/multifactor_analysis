@@ -27,12 +27,13 @@
             {{for factor in sorted(dts['factors'], key=lambda el: el['_id']):}}
                 {{# This is really innefficent! }}
                 {{factor_struct = dbm.factors.find_one({"_id": factor['_id']})}}
-                {{if factor['category'] == ObjectId(request.vars.category):}}
+		    <!-- Ok here some crazy stuff happens, probably some factor was incorrectly deleted  so had to test that factor_struct is not None  -->
+                {{if factor['category'] == ObjectId(request.vars.category) and factor_struct is not None:}}
                     {{for crit_idx, crit in enumerate(factor['criteria']):}}
                     <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-{{=crit["_id"]}}' class='editable {{=factor_struct["criteria"][crit_idx]["type"]}}'>{{=crit['value']}}</td>
                     {{pass}}
                     <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-rating' class="rating
-			{{if  factor_struct['rating_method']== 'manual':}} editable{{pass}}">{{='%.3g' % factor['rating']}}</td>
+			">{{='%.3g' % factor['rating']}}</td>
                 {{pass}}
             {{pass}}    
         </tr>
@@ -65,7 +66,11 @@
                                 "bJQueryUI": false,
                                 "sScrollX": "100%",
 				"sScrollXinner": "400%",
-                                "bScrollCollapse": true
+                                "bScrollCollapse": true,
+				"sDom": 'T<"clear">lfrtip',
+				"oTableTools": {
+				    "sSwfPath": "{{=URL('static','swf/copy_csv_xls_pdf.swf')}}"
+					    }
                                 }
 	);
 	/* var header_oTable = new FixedColumns( oTable ); */

@@ -27,15 +27,21 @@ for key in ['study', 'category']:
     if key in request.vars:
 	session.cvars[key] = ObjectId(request.vars[key])
 
+if request.controller in ['studies', 'dataset', 'analyse']:
+    controller_next = request.controller
+else:
+    controller_next = 'studies'
+
 response.menu = [
     (T('Home'), False, URL('default','index'), []),
     (T('Studies'), False, None,
-	[(s['title'], False, URL(c='studies', f='manage', vars=dict(study=s['_id'])))\
+	[(s['title'], False, URL(c=controller_next, f='manage', vars=dict(study=s['_id'])))\
 		for s in dbm.studies.find()])
     ]
 
 if session.cvars:
     response.menu += [
     (T('Setup'), False, URL(c='studies', f='manage', vars=session.cvars)),
-    (T('Dataset'), False, URL(c='dataset', f='manage', vars=session.cvars))
+    (T('Dataset'), False, URL(c='dataset', f='manage', vars=session.cvars)),
+    #(T('Analyse'), False, URL(c='analyse', f='index', vars=session.cvars))
     ]

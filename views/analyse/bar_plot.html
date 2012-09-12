@@ -1,0 +1,23 @@
+<h2> One factor comparaison </h2>
+
+{{=SELECT(*[OPTION(el['title'], _value=el['variable']) for el in factors], _style='width: 500px; height: 200px;', _id='bar-plot-select', _multiple=True)}}
+<input type="submit" value="Plot" id="bar-plot-submit">
+<div>
+Click on image to zoom.
+</div>
+<div class='mplt_plot bar-plot'>
+</div>
+<div>
+    The name of the companies can not be seen very well now, I'll try to fix it.
+</div>
+<script>
+$(document).ready(function(){
+    $('input#bar-plot-submit').click(function(){
+	var margs = $('#bar-plot-select').val();
+        $('div.bar-plot').html("<img src='{{=URL(c='analyse', f='bar_plot_compute')}}/"+margs.join('/')+"?study={{=request.vars['study']}}' />");
+	$('div.bar-plot img').zoomTarget({
+	    targetsize: 1.0    
+	});
+   });
+});
+</script>

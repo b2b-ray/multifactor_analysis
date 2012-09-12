@@ -3,6 +3,7 @@
 ## {{{ http://code.activestate.com/recipes/550804/ (r2)
 # The list of symbols that are included by default in the generated
 # function's environment
+from __future__ import division
 SAFE_SYMBOLS = ["list", "dict", "tuple", "set", "long", "float", "object",
                 "bool", "callable", "True", "False", "dir",
                 "frozenset", "getattr", "hasattr", "abs", "cmp", "complex",

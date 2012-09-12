@@ -28,21 +28,24 @@ def pcolor2d(title='title',xlab='x',ylab='y',
     canvas.print_png(stream)
     return stream.getvalue()
 
-def plot1factor(d):
-    fig=Figure()
+def bar_plot(d):
+    fig=Figure(figsize=(8, 6), dpi=200)
     fig.set_facecolor('white')
     ax=fig.add_subplot(111)
     ax.set_title("Test")
     ax.set_xlabel("companies")
     ax.set_ylabel('test')
-    ax.bar(range(len(d)), d, align='center')
-    ax.set_xticks(range(len(d)))
-    #ax.set_xticklabels([unicode(el) for el in d.index], size='small', rotation='vertical')
+    for col in d.columns:
+	ax.bar(range(len(d[col])), d[col], align='center')
+    ax.set_xticks(range(len(d[col])))
+    ax.set_xlim([-0.5, len(d[col])+1])
+    ax.set_xticklabels([unicode(el) for el in d[col].index], size='small',
+	    rotation='vertical')
 
 
     canvas=FigureCanvas(fig)
     stream=cStringIO.StringIO()
-    canvas.print_png(stream)
+    canvas.print_png(stream, bbox_inches='tight')
     return stream.getvalue()
 
 def plot(title='title',xlab='x',ylab='y',mode='plot',
