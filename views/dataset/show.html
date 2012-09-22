@@ -79,10 +79,10 @@
 	
          
         /* Apply the jEditable handlers to the table */
-        $('td.editable').editable('{{=URL(c="dataset", f="edit", vars=request.vars)}}', {
+        $('td.editable', oTable.fnGetNodes()).editable('{{=URL(c="dataset", f="edit", vars=request.vars)}}', {
             callback : function( sValue, y ) {
                 var aPos = oTable.fnGetPosition( this );
-                oTable.fnUpdate( sValue, aPos[0], aPos[1] );
+                oTable.fnUpdate( sValue, aPos[0], aPos[1], false, false );
                 var mids = $(this).attr('id').split('-');
                 /* recompute rating if we are not editing the title   */
                 if ((mids[3] != 'rating') && (mids.length == 4)) { 

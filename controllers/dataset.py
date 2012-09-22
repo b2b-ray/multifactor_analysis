@@ -17,10 +17,10 @@ def manage():
       'css/jquery.dataTables_themeroller.css',
       'css/demo_table.css',
       'css/demo_table_jui.css',
+      'js/TableTools.min.js',
       'js/jquery.validate.js',
       'js/jquery.jeditable.mini.js',
       'js/FixedColumns.min.js',
-      'js/TableTools.min.js',
       'css/TableTools.css',
       ]
     for f in _append_files:
