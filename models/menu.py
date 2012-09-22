@@ -43,5 +43,5 @@ if session.cvars:
     response.menu += [
     (T('Setup'), False, URL(c='studies', f='manage', vars=session.cvars)),
     (T('Dataset'), False, URL(c='dataset', f='manage', vars=session.cvars)),
-    #(T('Analyse'), False, URL(c='analyse', f='index', vars=session.cvars))
-    ]
+    (T('Analyse'), False, URL(c='analyse', f='index', vars=session.cvars))
+	    ]

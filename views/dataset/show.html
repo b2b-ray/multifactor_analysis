@@ -33,6 +33,7 @@
                     <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-{{=crit["_id"]}}' class='editable {{=factor_struct["criteria"][crit_idx]["type"]}}'>{{=crit['value']}}</td>
                     {{pass}}
                     <td id='dts-{{=dts["_id"]}}-{{=factor["_id"]}}-rating' class="rating
+			{{if factor_struct['rating_method'] == 'manual':}} editable {{pass}}
 			">{{='%.3g' % factor['rating']}}</td>
                 {{pass}}
             {{pass}}    
@@ -68,6 +69,7 @@
 				"sScrollXinner": "400%",
                                 "bScrollCollapse": true,
 				"sDom": 'T<"clear">lfrtip',
+				"bPaginate": false,
 				"oTableTools": {
 				    "sSwfPath": "{{=URL('static','swf/copy_csv_xls_pdf.swf')}}"
 					    }

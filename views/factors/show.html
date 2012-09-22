@@ -41,7 +41,3 @@
 {{if factor['rating_method'] == 'manual':}} style='display: none;' {{pass}}>
 {{=LOAD(c='factors', f='show_field', args=[ _id, 'algorithm'])}}
 </div>
-
-<div id='{{=_id}}-default_weight' class='factor-default_weight'>
-{{=LOAD(c='factors', f='show_field', args=[ _id, 'default_weight'])}}
-</div>

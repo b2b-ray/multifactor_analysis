@@ -1,0 +1,41 @@
+<script>
+        $(function() {
+	    $( ".slider-outer" ).each( function(){ 
+		        var value = parseInt( $( this ).find('.slider-inner').text(), 10 );
+			$(this).find('input').val(value/10);
+		
+		        var mslide = $(this).find('.slider-inner').empty().slider({
+                        range: "min",
+                        min: 0,
+			value : value,
+                        max: 1000,
+			slide: function( event, ui ) {
+			        $($(this).parent().get(0)).find('input').val(ui.value/10);
+			},
+			change: function(event, ui) {
+			    _id = $(this).attr('id').split('-')[2];
+			    ajax("{{=URL(c='analyse',f='set_weight')}}/"+_id+'/'+ui.value, [], ':eval');
+			}
+
+                });
+		});
+        });
+</script>
+
+<h2> Factor weight definition </h2>
+{{for cat in rows:}}
+    <p class="ui-state-default ui-corner-all" style="padding:4px 4px 4px 15px; margin-top:3em;">
+    {{=cat['cat_title']}} </p>
+    <div class='slider-group'>
+    {{for factor in cat['list']:}}
+    <div id='slider-{{=str(factor["_id"])}}' class='slider-outer'>
+	<label>{{=factor['title']}}:</label>
+	<input type="text"  style="border:0; color:#f6931f; font-weight:bold;" />
+
+	<div id="slider-range-{{=str(factor['_id'])}}" class='slider-inner'>{{=factor['weight']*1000}}</div>
+    </div>
+    {{pass}}
+    </div>
+
+{{pass}}
+

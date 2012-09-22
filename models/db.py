@@ -51,7 +51,9 @@ auth.settings.create_user_groups = False
 # requireing login for all application
 if not auth.is_logged_in() and (request.controller != 'default'):
     session.flash = 'You need to be logged in to access this page!'
-    redirect(URL(r=request, c='default', f='user', args=['login']))
+    redirect(URL(r=request, c='default', f='user', args=['login'], 
+	vars=dict(_next=URL(c=request.controller, f=request.function, vars=request.vars, args=request.args))))
+    
 
 ## if you need to use OpenID, Facebook, MySpace, Twitter, Linkedin, etc.
 ## register with janrain.com, write your domain:api_key in private/janrain.key

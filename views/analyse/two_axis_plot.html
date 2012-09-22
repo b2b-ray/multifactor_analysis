@@ -1,0 +1,19 @@
+<h2> Multifactor comparaison </h2>
+
+{{=SELECT(*[OPTION(el['title'], _value=el['_id']) for el in cats], _style='width: 500px; height: 100px;', _id='two-axis-plot-select', _multiple=True)}}
+<input type="submit" value="Plot" id="two-axis-plot-submit">
+
+<div class='mplt_plot two-axis-plot'>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('input#two-axis-plot-submit').click(function(){
+	var margs = $('#two-axis-plot-select').val();
+        $('div.two-axis-plot').html("<img src='{{=URL(c='analyse', f='two_axis_plot_compute')}}/"+margs.join('/')+"?study={{=request.vars['study']}}' />");
+	$('.mplt_plot img').zoomTarget({
+	    targetsize: 1.0    
+	});
+   });
+});
+</script>

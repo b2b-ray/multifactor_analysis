@@ -22,7 +22,7 @@ def add():
     mvars['algorithm_description'] = ''
     mvars['algorithm'] = ''
     mvars['variable'] = ''
-    mvars['default_weight'] = 0
+    mvars['weight'] = 0
     mvars['rating_method'] = 'algorithm'
     _id = str(dbm.factors.insert(mvars))
     # now make sure that corresponding fields are allso inserted into 
@@ -94,11 +94,6 @@ def edit_internal():
             Field('title', 'string'),
             **defaults
             )
-    elif field == 'default_weight':
-        form = SQLFORM.factory(
-            Field('default_weight', 'double', requires=IS_FLOAT_IN_RANGE(0, 100)),
-            **defaults
-            )
     elif field == 'variable':
         form = SQLFORM.factory(
             Field('variable', 'string', requires=IS_MATCH(r'[A-Za-z][A-Za-z0-9_]+$',
@@ -112,10 +107,7 @@ def edit_internal():
         form.vars.update({field: factor[field]})
     # checking if update
     if form.process().accepted:
-        if field == 'default_weight':
-            form.vars[field] = float(form.vars[field])
-        else:
-            form.vars[field] = form.vars[field].strip()
+	form.vars[field] = form.vars[field].strip()
         dbm.factors.update( _id, {"$set": { field: form.vars[field]}})
         if field == 'algorithm':
             LOAD(c='dataset', f='recompute_rating',

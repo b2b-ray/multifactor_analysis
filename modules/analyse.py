@@ -14,9 +14,12 @@ def mongo2pandas(dbm, study, mfilter={}):
     q_dts = {'study': _sid}
     if mfilter:
         q_factors.update(mfilter)
-
+    factors = list(dbm.factors.find(q_factors))
+    cols_and_title = [(el['variable'], el['title']) for el in factors]
+    columns = zip(*cols_and_title)[0]
+    labels = dict(cols_and_title)
     d = pandas.DataFrame(
-            columns=[el['variable'] for el in dbm.factors.find(q_factors)],
+            columns=columns,
             index=[el['name'] for el in dbm.dataset.find({'study': _sid},
 				    sort=[('_id',1)])],
             dtype=object)
@@ -26,5 +29,14 @@ def mongo2pandas(dbm, study, mfilter={}):
             if all([factor[key] == mfilter[key] for key in mfilter]):
 		d[d.columns[idx]][dts['name']] = factor['rating']
                 idx += 1
-    return d
+    d = d.sort_index()
+
+    # generate weights 
+    w = pandas.DataFrame(d.copy(deep=True), dtype=float)
+    for f in factors:
+	w[f['variable']][:] = f['weight'] 
+    # normalizing
+    w = w/w.sum(axis=1)[0]
+
+    return d, w, labels
 

@@ -1,6 +1,13 @@
-<h2> One factor comparaison </h2>
 
-{{=SELECT(*[OPTION(el['title'], _value=el['variable']) for el in factors], _style='width: 500px; height: 200px;', _id='bar-plot-select', _multiple=True)}}
+<select style='width: 500px; height: 200px;', id='bar-plot-select', multiple='multiple' >
+{{for cat in rows:}}
+<optgroup label='{{=cat["cat_title"]}}'>
+    {{for factor in cat['list']:}}
+    <option value={{=factor['variable']}}> {{=factor['title']}} </option>
+    {{pass}}
+</optgroup>
+{{pass}}
+</select>
 <input type="submit" value="Plot" id="bar-plot-submit">
 <div>
 Click on image to zoom.
@@ -8,7 +15,6 @@ Click on image to zoom.
 <div class='mplt_plot bar-plot'>
 </div>
 <div>
-    The name of the companies can not be seen very well now, I'll try to fix it.
 </div>
 <script>
 $(document).ready(function(){
