@@ -8,7 +8,7 @@ if sys.version[:3] == '2.7':
 else:
     from pymongo.objectid import ObjectId
 
-def mongo2pandas(dbm, study, mfilter={}):
+def mongo2pandas(dbm, study, mfilter={}, normalize_weights=True):
     _sid = ObjectId(study)
     q_factors = {'study': _sid}
     q_dts = {'study': _sid}
@@ -24,11 +24,19 @@ def mongo2pandas(dbm, study, mfilter={}):
 				    sort=[('_id',1)])],
             dtype=object)
     for dts in dbm.dataset.find(q_dts):
-        idx = 0
-        for factor in dts['factors']:
-            if all([factor[key] == mfilter[key] for key in mfilter]):
-		d[d.columns[idx]][dts['name']] = factor['rating']
-                idx += 1
+	for column in d.columns:
+	    _fid = filter(lambda x: x['variable']==column, factors)[0]['_id']
+	    cfactor = filter(lambda x: x['_id'] == _fid, dts['factors'])[0]
+    	    d[column][dts['name']] = cfactor['rating']
+
+
+
+	# older version, this is wrong
+        #idx = 0
+        #for factor in dts['factors']:
+        #    if all([factor[key] == mfilter[key] for key in mfilter]):
+	#	d[d.columns[idx]][dts['name']] = factor['rating']
+        #        idx += 1
     d = d.sort_index()
 
     # generate weights 
@@ -36,7 +44,8 @@ def mongo2pandas(dbm, study, mfilter={}):
     for f in factors:
 	w[f['variable']][:] = f['weight'] 
     # normalizing
-    w = w/w.sum(axis=1)[0]
+    if normalize_weights:
+	w = w/w.sum(axis=1)[0]
 
     return d, w, labels
 
