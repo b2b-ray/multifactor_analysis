@@ -1,19 +1,41 @@
 <h2> Multifactor comparaison </h2>
 
+<div class='plot-form'>
 {{=SELECT(*[OPTION(el['title'], _value=el['_id']) for el in cats], _style='width: 500px; height: 100px;', _id='two-axis-plot-select', _multiple=True)}}
-<input type="submit" value="Plot" id="two-axis-plot-submit">
+    
+<div class='plot-options'>
+    <input type="checkbox" value="True" name='pca'>  <a href='http://ru.wikipedia.org/wiki/%D0%9C%D0%B5%D1%82%D0%BE%D0%B4_%D0%B3%D0%BB%D0%B0%D0%B2%D0%BD%D1%8B%D1%85_%D0%BA%D0%BE%D0%BC%D0%BF%D0%BE%D0%BD%D0%B5%D0%BD%D1%82'>Визуализация методом главных компонентов</a>  <br />
+    <input type="checkbox" value="True" name='cluster'>  K-mean кластеринг <br />
+    <div class='clustering-options'>
+	<div class='use_categories'><input type="checkbox" value="True" name='use_categories'> Использовать категории </div>
+	<div class='n_clusters'>
+	    Расчёт по {{=SELECT(*[OPTION(val, _value=val) for val in range(2,11)], _name='n_clusters', _style='width: 50px;')}} кластерам.</div>
+    </div>
 
-<div class='mplt_plot two-axis-plot'>
+<input type="submit" value="Plot" id="two-axis-plot-submit">
+</div>
+</div>
+<div style='clear: both;'></div>
+<div class='mplt_plot two-axis-plot' id='two-axis_plot'>
 </div>
 
 <script>
 $(document).ready(function(){
     $('input#two-axis-plot-submit').click(function(){
 	var margs = $('#two-axis-plot-select').val();
-        $('div.two-axis-plot').html("<img src='{{=URL(c='analyse', f='two_axis_plot_compute')}}/"+margs.join('/')+"?study={{=request.vars['study']}}' />");
-	$('.mplt_plot img').zoomTarget({
-	    targetsize: 1.0    
-	});
+	console.log(margs);
+	ajax("{{=URL(c='analyse', f='two_axis_plot_compute')}}/"+margs.join('/')+"?type=html&study={{=request.vars['study']}}", ['pca', 'cluster', 'use_categories', 'n_clusters'], 'two-axis_plot');
+   });
+
+   $('.use_categories').hide();
+   $('.n_clusters').hide();
+   $('input[name="cluster"]').change(function(){
+       $('.use_categories').toggle();
+       $('.n_clusters').toggle();
+    });
+   $('input[name="pca"]').change(function(){
+       if ($('input[name="cluster"]').attr('checked')) 
+           $('.use_categories').toggle();
    });
 });
 </script>

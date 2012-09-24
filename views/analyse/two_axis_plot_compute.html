@@ -1,0 +1,57 @@
+{{import numpy as np}}
+{{if request.vars.cluster:}}
+<br />
+Подробную информацию о K-means кластеринг можна получить <a href='http://ru.wikipedia.org/wiki/K-means'>тут</a>.
+<table cellpadding="0" cellspacing="0" border="0" class="display cluster" width="100%">
+    <thead>
+	<tr>
+	    {{for val in ctable.columns:}}
+	    <th> Кластер {{=val+1}} </th>
+	    {{pass}}
+	</tr>
+    </thead>
+    <tbody>
+	{{for idx in ctable.index:}}
+	<tr>
+	    {{for column in ctable.columns:}}
+	    <td>
+		{{=ctable[column][idx]}}
+	    </td>
+	    {{pass}}
+
+	</tr>
+	{{pass}}
+    </tbody>
+</table>
+{{pass}}
+<div class='statusbar clearfix'>
+{{=IMG(_src=URL('static', 'images/warning_icon.png'), _style='width: 20px;')}}
+На данный момент таблица кластеров више, и кластеры на графике созданы двумя отдельными вызовами алгоритма K-means, хотя и используя одни и те-же данные. Это значит что: 
+<ul>
+    <li>  в большинстве случаев кластера будут одни и те-же но номера могут не совпадать.</li>
+    <li>  в редких случаях, когда разбитие данных на кластера не однозначно, и поскольку результат алгоритма K-means завист от інициализации, в таблице и на графике могуть быть разные результаты. Это не значит что один из них правильный, а другой нет, но скорее что в данном случае возможно несколько решений. </li>
+</ul>
+</div>
+
+{{=img}}
+<script>
+$(document).ready(function(){
+        var oTable = $('table.cluster').dataTable({
+                                "bJQueryUI": false,
+                                "sScrollX": "100%",
+				"sScrollXinner": "400%",
+                                "bScrollCollapse": true,
+				"sDom": 'T<"clear">lfrtip',
+				"bPaginate": false,
+				"sScrollY": "300px",
+				"bSort": false,
+				"oTableTools": {
+				    "sSwfPath": "{{=URL('static','swf/copy_csv_xls_pdf.swf')}}"
+					    }
+                                });
+
+	$('.mplt_plot img').zoomTarget({
+	    targetsize: 1.0    
+	});
+   });
+</script>

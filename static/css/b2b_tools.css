@@ -86,3 +86,20 @@ table.display tr.even td.rating {
 .slider-group {
     padding: 0 30px 0 50px;
 }
+
+.plot-options {
+    float: left;
+    padding-left: 30px;
+}
+
+#two-axis-plot-select {
+    float: left;
+}
+
+.plot-form {
+    min-height: 100px;
+}
+
+.clustering-options {
+    padding-left: 40px;
+}

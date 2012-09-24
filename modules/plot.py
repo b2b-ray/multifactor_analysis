@@ -11,6 +11,7 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 from matplotlib import rc
 import numpy as np
+import pandas
 rc('text', usetex=False)
 
 
@@ -57,17 +58,36 @@ def bar_plot(d, labels):
     canvas.print_png(stream, bbox_inches='tight')
     return stream.getvalue()
 
-def two_axis_plot(x_val, y_val, xlabel='', ylabel=''):
+def two_axis_plot(X=None, xval=None, yval=None, c=None, xlabel='', ylabel='', title=''):
+    if X is None:
+	X = pandas.DataFrame(index=xval.index, columns=['x', 'y', 'c'])
+	X['x'] = xval
+	X['y'] = yval
+	X['c'] = c
+
     colors = itertools.cycle(['b', 'g', 'r', 'c', 'm', 'y', 'k'])
+    markers = itertools.cycle(['o', 'd', 's', 'p', '^'])
     fig=Figure(figsize=(12, 8), dpi=200)
     fig.set_facecolor('white')
     #fig.subplots_adjust(bottom=0.30)
     ax=fig.add_subplot(111)
-    ax.set_title("")
+    ax.set_title(title)
     ax.set_ylabel(ylabel)
     ax.set_xlabel(xlabel)
-    ax.scatter(x_val.values, y_val.values, marker='o')
-    for label, x, y in zip(x_val.index, x_val.values, y_val.values):
+    if len(np.unique(X.c.values)) == 1:
+	ax.scatter(X.x.values, X.y.values, marker='o')
+    else:
+	for c in range(len(np.unique(X.c.values):
+	    _idx = X.c == c
+	    ax.scatter(X.x[_idx].values, X.y[_idx].values,
+		    c=colors.next(), marker=markers.next(), label=str(c+1),
+		    linewidths=0.5
+		    )
+	leg = ax.legend(loc='best', fancybox=True, prop={'size':9})
+	leg.get_frame().set_alpha(0.5)
+
+
+    for label, x, y in zip(X.index, X.x.values, X.y.values):
 	ax.annotate(
     	    label,
 		xy= (x,y),
@@ -75,9 +95,11 @@ def two_axis_plot(x_val, y_val, xlabel='', ylabel=''):
 		textcoords = 'offset points', ha = 'center', va = 'bottom',
 		fontsize='x-small',
 		alpha=0.5)
+    Dx = X.x.max() - X.x.min()
+    Dy = X.y.max() - X.y.min()
 
-    #ax.set_xlim([-0.1, 1.1])
-    #ax.set_ylim([-0.1, 1.1])
+    ax.set_xlim([X.x.min()-0.03*Dx, X.x.max()+0.03*Dx])
+    ax.set_ylim([X.y.min()-0.01*Dy, X.y.max()+0.03*Dy])
 
     canvas=FigureCanvas(fig)
     stream=cStringIO.StringIO()
