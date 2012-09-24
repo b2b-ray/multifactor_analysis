@@ -66,10 +66,11 @@
         var oTable = $('#example').dataTable({
                                 "bJQueryUI": false,
                                 "sScrollX": "100%",
+                                "sScrollY": "300px",
 				"sScrollXinner": "400%",
                                 "bScrollCollapse": true,
 				"sDom": 'T<"clear">lfrtip',
-				"bPaginate": true,
+				"bPaginate": false,
 				"oTableTools": {
 				    "sSwfPath": "{{=URL('static','swf/copy_csv_xls_pdf.swf')}}"
 					    }
@@ -79,9 +80,10 @@
 	
          
         /* Apply the jEditable handlers to the table */
-        $('td.editable', oTable.fnGetNodes()).editable('{{=URL(c="dataset", f="edit", vars=request.vars)}}', {
+	/* Removed pagination and then oTable.fnGetNodes() is not usefull anymore  */
+        $('td.editable').editable('{{=URL(c="dataset", f="edit", vars=request.vars)}}', {
             callback : function( sValue, y ) {
-                var pos = oTable.fnGetPosition(this);
+               /* var pos = oTable.fnGetPosition(this);*/
                /* oTable.fnUpdate('ggg', pos[1], pos[2]);*/
 		
                 var mids = $(this).attr('id').split('-');
@@ -93,8 +95,8 @@
                 }
             },
             submitdata: function ( value, settings ) {
-                return { "row_id": this.parentNode.getAttribute('id'),
-			  "column": oTable.fnGetPosition( this )[2]};
+                /*return { "row_id": this.parentNode.getAttribute('id'),
+			  "column": oTable.fnGetPosition( this )[2]}; */
             },
             width: "100%",
             tooltip: "Edit",
@@ -110,6 +112,7 @@
                 } ,
 
 	} ); 
+	console.log(Object.keys(header_oTable));
     } );
 
 
