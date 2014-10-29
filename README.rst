@@ -1,16 +1,18 @@
 Multifactor analysis toolkit
 ============================
 
+A web2py application for segmentation/clustering studies. 
 
-Add description here...
 
 Dependencies:
 -------------
 
-* >=python-2.6
-* web2py
-* MongoDB
-* pandas
-* matplotlib
+ * >=python-2.6
+ * web2py
+ * MongoDB
+ * pandas
+ * scipy
+ * numpy
+ * matplotlib
 
 
